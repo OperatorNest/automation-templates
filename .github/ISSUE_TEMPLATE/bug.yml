@@ -1,0 +1,31 @@
+name: Bug report
+description: Report a reproducible problem with a template or validator.
+title: "Bug: "
+body:
+  - type: markdown
+    attributes:
+      value: "Remove secrets and personal data. Report vulnerabilities through SECURITY.md."
+  - type: input
+    id: file
+    attributes:
+      label: Affected file and release
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Client and Node.js versions
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps and fictional inputs
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and observed behavior
+    validations:
+      required: true

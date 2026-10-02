@@ -1,0 +1,26 @@
+{
+  "name": "@operatornest/automation-templates",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Three public API checks as n8n workflows and Make blueprints.",
+  "type": "module",
+  "license": "MIT",
+  "author": {
+    "name": "OperatorNest",
+    "email": "operatornest+github@gmail.com"
+  },
+  "homepage": "https://operatornest.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OperatorNest/automation-templates"
+  },
+  "bugs": {
+    "url": "https://github.com/OperatorNest/automation-templates/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "validate": "node scripts/check.mjs"
+  }
+}

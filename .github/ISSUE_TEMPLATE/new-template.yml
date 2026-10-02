@@ -1,0 +1,28 @@
+name: New template request
+description: Propose a repeatable job with a concrete result.
+title: "Request: "
+body:
+  - type: textarea
+    id: job
+    attributes:
+      label: Job and who needs it
+    validations:
+      required: true
+  - type: textarea
+    id: inputs
+    attributes:
+      label: Inputs and fictional example
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Expected output and result checks
+    validations:
+      required: true
+  - type: textarea
+    id: authority
+    attributes:
+      label: Actions that need approval and client requirements
+    validations:
+      required: true

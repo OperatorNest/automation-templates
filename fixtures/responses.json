@@ -1,0 +1,1787 @@
+{
+  "captured": "2026-10-02",
+  "source": "Local public tool contract examples; not live API responses.",
+  "cases": [
+    {
+      "job": "weekly-api-budget",
+      "request": {
+        "inputTokens": 10000,
+        "cachedInputTokens": 5000,
+        "outputTokens": 2000,
+        "requestsPerDay": 100,
+        "requestsPerMonth": 3000,
+        "modelIds": [
+          "anthropic/claude-opus-5-5",
+          "openai/gpt-5.4"
+        ]
+      },
+      "response": {
+        "tool": "ai-api-cost-calculator",
+        "input": {
+          "inputTokens": 10000,
+          "cachedInputTokens": 5000,
+          "outputTokens": 2000,
+          "requestsPerDay": 100,
+          "requestsPerMonth": 3000,
+          "modelIds": [
+            "anthropic/claude-opus-5-5",
+            "openai/gpt-5.4"
+          ],
+          "batchModelIds": []
+        },
+        "units": {
+          "tokens": "tokens/request",
+          "rates": "USD/million tokens",
+          "estimates": "USD"
+        },
+        "method": "((input - cached) × input rate + cached × cache rate + output × output rate) / 1000000",
+        "assumptions": [
+          "Cached rate falls back to input rate when absent.",
+          "Non-token charges excluded; batch discounts only when published and requested.",
+          "Published long-context rates apply above the catalog threshold."
+        ],
+        "provenance": {
+          "source": "models.dev",
+          "snapshotAt": "2026-09-28T17:08:16.340Z"
+        },
+        "estimates": [
+          {
+            "modelId": "anthropic/claude-opus-5-5",
+            "name": "Claude Opus 5.5",
+            "perRequest": 0.061,
+            "perDay": 6.1,
+            "perMonth": 183,
+            "longContext": false,
+            "batch": false,
+            "ratesPerMillion": {
+              "input": 4,
+              "cachedInput": 0.2,
+              "output": 20
+            },
+            "sourceUrl": "https://docs.anthropic.com/en/docs/about-claude/models",
+            "note": ""
+          },
+          {
+            "modelId": "openai/gpt-5.4",
+            "name": "GPT-5.4",
+            "perRequest": 0.04375,
+            "perDay": 4.375,
+            "perMonth": 131.25,
+            "longContext": false,
+            "batch": false,
+            "ratesPerMillion": {
+              "input": 2.5,
+              "cachedInput": 0.25,
+              "output": 15
+            },
+            "sourceUrl": "https://platform.openai.com/docs/models",
+            "note": ""
+          }
+        ]
+      }
+    },
+    {
+      "job": "team-meeting-slots",
+      "request": {
+        "date": "2026-10-05",
+        "people": [
+          {
+            "name": "Sam",
+            "zone": "America/Los_Angeles"
+          },
+          {
+            "name": "Priya",
+            "zone": "America/New_York"
+          }
+        ]
+      },
+      "response": {
+        "tool": "meeting-time-zone-planner",
+        "input": {
+          "date": "2026-10-05",
+          "people": [
+            {
+              "name": "Sam",
+              "zone": "America/Los_Angeles"
+            },
+            {
+              "name": "Priya",
+              "zone": "America/New_York"
+            }
+          ]
+        },
+        "units": {
+          "duration": "minutes",
+          "startUtc": "ISO 8601 UTC",
+          "score": "sum of hours from 13:00 at slot midpoint"
+        },
+        "method": "Enumerate real half-hour instants on the first person’s local date; rank shared workday slots by distance from 13:00.",
+        "assumptions": [
+          "Workday is 09:00–17:00 in each time zone.",
+          "Meeting length is 30 minutes.",
+          "No holiday or calendar availability lookup."
+        ],
+        "provenance": {
+          "timeZones": "Runtime Intl time zone database; DST applied for the selected date."
+        },
+        "rows": [
+          {
+            "start": 1791183600000,
+            "startUtc": "2026-10-05T07:00:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 12:00 a.m. PDT",
+              "Mon, Oct 5, 3:00 a.m. EDT"
+            ],
+            "score": 22.5
+          },
+          {
+            "start": 1791185400000,
+            "startUtc": "2026-10-05T07:30:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 12:30 a.m. PDT",
+              "Mon, Oct 5, 3:30 a.m. EDT"
+            ],
+            "score": 21.5
+          },
+          {
+            "start": 1791187200000,
+            "startUtc": "2026-10-05T08:00:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 1:00 a.m. PDT",
+              "Mon, Oct 5, 4:00 a.m. EDT"
+            ],
+            "score": 20.5
+          },
+          {
+            "start": 1791189000000,
+            "startUtc": "2026-10-05T08:30:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 1:30 a.m. PDT",
+              "Mon, Oct 5, 4:30 a.m. EDT"
+            ],
+            "score": 19.5
+          },
+          {
+            "start": 1791190800000,
+            "startUtc": "2026-10-05T09:00:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 2:00 a.m. PDT",
+              "Mon, Oct 5, 5:00 a.m. EDT"
+            ],
+            "score": 18.5
+          },
+          {
+            "start": 1791192600000,
+            "startUtc": "2026-10-05T09:30:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 2:30 a.m. PDT",
+              "Mon, Oct 5, 5:30 a.m. EDT"
+            ],
+            "score": 17.5
+          },
+          {
+            "start": 1791194400000,
+            "startUtc": "2026-10-05T10:00:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 3:00 a.m. PDT",
+              "Mon, Oct 5, 6:00 a.m. EDT"
+            ],
+            "score": 16.5
+          },
+          {
+            "start": 1791196200000,
+            "startUtc": "2026-10-05T10:30:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 3:30 a.m. PDT",
+              "Mon, Oct 5, 6:30 a.m. EDT"
+            ],
+            "score": 15.5
+          },
+          {
+            "start": 1791198000000,
+            "startUtc": "2026-10-05T11:00:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 4:00 a.m. PDT",
+              "Mon, Oct 5, 7:00 a.m. EDT"
+            ],
+            "score": 14.5
+          },
+          {
+            "start": 1791199800000,
+            "startUtc": "2026-10-05T11:30:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 4:30 a.m. PDT",
+              "Mon, Oct 5, 7:30 a.m. EDT"
+            ],
+            "score": 13.5
+          },
+          {
+            "start": 1791201600000,
+            "startUtc": "2026-10-05T12:00:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 5:00 a.m. PDT",
+              "Mon, Oct 5, 8:00 a.m. EDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791203400000,
+            "startUtc": "2026-10-05T12:30:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 5:30 a.m. PDT",
+              "Mon, Oct 5, 8:30 a.m. EDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791205200000,
+            "startUtc": "2026-10-05T13:00:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 6:00 a.m. PDT",
+              "Mon, Oct 5, 9:00 a.m. EDT"
+            ],
+            "score": 10.5
+          },
+          {
+            "start": 1791207000000,
+            "startUtc": "2026-10-05T13:30:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 6:30 a.m. PDT",
+              "Mon, Oct 5, 9:30 a.m. EDT"
+            ],
+            "score": 9.5
+          },
+          {
+            "start": 1791208800000,
+            "startUtc": "2026-10-05T14:00:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 7:00 a.m. PDT",
+              "Mon, Oct 5, 10:00 a.m. EDT"
+            ],
+            "score": 8.5
+          },
+          {
+            "start": 1791210600000,
+            "startUtc": "2026-10-05T14:30:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 7:30 a.m. PDT",
+              "Mon, Oct 5, 10:30 a.m. EDT"
+            ],
+            "score": 7.5
+          },
+          {
+            "start": 1791212400000,
+            "startUtc": "2026-10-05T15:00:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 8:00 a.m. PDT",
+              "Mon, Oct 5, 11:00 a.m. EDT"
+            ],
+            "score": 6.5
+          },
+          {
+            "start": 1791214200000,
+            "startUtc": "2026-10-05T15:30:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 8:30 a.m. PDT",
+              "Mon, Oct 5, 11:30 a.m. EDT"
+            ],
+            "score": 5.5
+          },
+          {
+            "start": 1791216000000,
+            "startUtc": "2026-10-05T16:00:00.000Z",
+            "inside": [
+              true,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 9:00 a.m. PDT",
+              "Mon, Oct 5, 12:00 p.m. EDT"
+            ],
+            "score": 4.5
+          },
+          {
+            "start": 1791217800000,
+            "startUtc": "2026-10-05T16:30:00.000Z",
+            "inside": [
+              true,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 9:30 a.m. PDT",
+              "Mon, Oct 5, 12:30 p.m. EDT"
+            ],
+            "score": 3.5
+          },
+          {
+            "start": 1791219600000,
+            "startUtc": "2026-10-05T17:00:00.000Z",
+            "inside": [
+              true,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 10:00 a.m. PDT",
+              "Mon, Oct 5, 1:00 p.m. EDT"
+            ],
+            "score": 3
+          },
+          {
+            "start": 1791221400000,
+            "startUtc": "2026-10-05T17:30:00.000Z",
+            "inside": [
+              true,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 10:30 a.m. PDT",
+              "Mon, Oct 5, 1:30 p.m. EDT"
+            ],
+            "score": 3
+          },
+          {
+            "start": 1791223200000,
+            "startUtc": "2026-10-05T18:00:00.000Z",
+            "inside": [
+              true,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 11:00 a.m. PDT",
+              "Mon, Oct 5, 2:00 p.m. EDT"
+            ],
+            "score": 3
+          },
+          {
+            "start": 1791225000000,
+            "startUtc": "2026-10-05T18:30:00.000Z",
+            "inside": [
+              true,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 11:30 a.m. PDT",
+              "Mon, Oct 5, 2:30 p.m. EDT"
+            ],
+            "score": 3
+          },
+          {
+            "start": 1791226800000,
+            "startUtc": "2026-10-05T19:00:00.000Z",
+            "inside": [
+              true,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 12:00 p.m. PDT",
+              "Mon, Oct 5, 3:00 p.m. EDT"
+            ],
+            "score": 3
+          },
+          {
+            "start": 1791228600000,
+            "startUtc": "2026-10-05T19:30:00.000Z",
+            "inside": [
+              true,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 12:30 p.m. PDT",
+              "Mon, Oct 5, 3:30 p.m. EDT"
+            ],
+            "score": 3
+          },
+          {
+            "start": 1791230400000,
+            "startUtc": "2026-10-05T20:00:00.000Z",
+            "inside": [
+              true,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 1:00 p.m. PDT",
+              "Mon, Oct 5, 4:00 p.m. EDT"
+            ],
+            "score": 3.5
+          },
+          {
+            "start": 1791232200000,
+            "startUtc": "2026-10-05T20:30:00.000Z",
+            "inside": [
+              true,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 1:30 p.m. PDT",
+              "Mon, Oct 5, 4:30 p.m. EDT"
+            ],
+            "score": 4.5
+          },
+          {
+            "start": 1791234000000,
+            "startUtc": "2026-10-05T21:00:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 2:00 p.m. PDT",
+              "Mon, Oct 5, 5:00 p.m. EDT"
+            ],
+            "score": 5.5
+          },
+          {
+            "start": 1791235800000,
+            "startUtc": "2026-10-05T21:30:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 2:30 p.m. PDT",
+              "Mon, Oct 5, 5:30 p.m. EDT"
+            ],
+            "score": 6.5
+          },
+          {
+            "start": 1791237600000,
+            "startUtc": "2026-10-05T22:00:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 3:00 p.m. PDT",
+              "Mon, Oct 5, 6:00 p.m. EDT"
+            ],
+            "score": 7.5
+          },
+          {
+            "start": 1791239400000,
+            "startUtc": "2026-10-05T22:30:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 3:30 p.m. PDT",
+              "Mon, Oct 5, 6:30 p.m. EDT"
+            ],
+            "score": 8.5
+          },
+          {
+            "start": 1791241200000,
+            "startUtc": "2026-10-05T23:00:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 4:00 p.m. PDT",
+              "Mon, Oct 5, 7:00 p.m. EDT"
+            ],
+            "score": 9.5
+          },
+          {
+            "start": 1791243000000,
+            "startUtc": "2026-10-05T23:30:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 4:30 p.m. PDT",
+              "Mon, Oct 5, 7:30 p.m. EDT"
+            ],
+            "score": 10.5
+          },
+          {
+            "start": 1791244800000,
+            "startUtc": "2026-10-06T00:00:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 5:00 p.m. PDT",
+              "Mon, Oct 5, 8:00 p.m. EDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791246600000,
+            "startUtc": "2026-10-06T00:30:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 5:30 p.m. PDT",
+              "Mon, Oct 5, 8:30 p.m. EDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791248400000,
+            "startUtc": "2026-10-06T01:00:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 6:00 p.m. PDT",
+              "Mon, Oct 5, 9:00 p.m. EDT"
+            ],
+            "score": 13.5
+          },
+          {
+            "start": 1791250200000,
+            "startUtc": "2026-10-06T01:30:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 6:30 p.m. PDT",
+              "Mon, Oct 5, 9:30 p.m. EDT"
+            ],
+            "score": 14.5
+          },
+          {
+            "start": 1791252000000,
+            "startUtc": "2026-10-06T02:00:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 7:00 p.m. PDT",
+              "Mon, Oct 5, 10:00 p.m. EDT"
+            ],
+            "score": 15.5
+          },
+          {
+            "start": 1791253800000,
+            "startUtc": "2026-10-06T02:30:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 7:30 p.m. PDT",
+              "Mon, Oct 5, 10:30 p.m. EDT"
+            ],
+            "score": 16.5
+          },
+          {
+            "start": 1791255600000,
+            "startUtc": "2026-10-06T03:00:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 8:00 p.m. PDT",
+              "Mon, Oct 5, 11:00 p.m. EDT"
+            ],
+            "score": 17.5
+          },
+          {
+            "start": 1791257400000,
+            "startUtc": "2026-10-06T03:30:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 8:30 p.m. PDT",
+              "Mon, Oct 5, 11:30 p.m. EDT"
+            ],
+            "score": 18.5
+          },
+          {
+            "start": 1791259200000,
+            "startUtc": "2026-10-06T04:00:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 9:00 p.m. PDT",
+              "Tue, Oct 6, 12:00 a.m. EDT"
+            ],
+            "score": 21
+          },
+          {
+            "start": 1791261000000,
+            "startUtc": "2026-10-06T04:30:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 9:30 p.m. PDT",
+              "Tue, Oct 6, 12:30 a.m. EDT"
+            ],
+            "score": 21
+          },
+          {
+            "start": 1791262800000,
+            "startUtc": "2026-10-06T05:00:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 10:00 p.m. PDT",
+              "Tue, Oct 6, 1:00 a.m. EDT"
+            ],
+            "score": 21
+          },
+          {
+            "start": 1791264600000,
+            "startUtc": "2026-10-06T05:30:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 10:30 p.m. PDT",
+              "Tue, Oct 6, 1:30 a.m. EDT"
+            ],
+            "score": 21
+          },
+          {
+            "start": 1791266400000,
+            "startUtc": "2026-10-06T06:00:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 11:00 p.m. PDT",
+              "Tue, Oct 6, 2:00 a.m. EDT"
+            ],
+            "score": 21
+          },
+          {
+            "start": 1791268200000,
+            "startUtc": "2026-10-06T06:30:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 11:30 p.m. PDT",
+              "Tue, Oct 6, 2:30 a.m. EDT"
+            ],
+            "score": 21
+          }
+        ],
+        "overlapCount": 10,
+        "bestSlots": [
+          {
+            "start": 1791219600000,
+            "startUtc": "2026-10-05T17:00:00.000Z",
+            "inside": [
+              true,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 10:00 a.m. PDT",
+              "Mon, Oct 5, 1:00 p.m. EDT"
+            ],
+            "score": 3
+          },
+          {
+            "start": 1791221400000,
+            "startUtc": "2026-10-05T17:30:00.000Z",
+            "inside": [
+              true,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 10:30 a.m. PDT",
+              "Mon, Oct 5, 1:30 p.m. EDT"
+            ],
+            "score": 3
+          },
+          {
+            "start": 1791223200000,
+            "startUtc": "2026-10-05T18:00:00.000Z",
+            "inside": [
+              true,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 11:00 a.m. PDT",
+              "Mon, Oct 5, 2:00 p.m. EDT"
+            ],
+            "score": 3
+          }
+        ]
+      }
+    },
+    {
+      "job": "recurring-schedule",
+      "request": {
+        "startDate": "2026-10-05",
+        "tasks": [
+          {
+            "title": "Investor update",
+            "frequency": "weekly",
+            "day": "MO",
+            "monthday": 1,
+            "time": "09:00",
+            "minutes": 35,
+            "owner": "delegate"
+          }
+        ]
+      },
+      "response": {
+        "tool": "recurring-task-planner",
+        "input": {
+          "startDate": "2026-10-05",
+          "tasks": [
+            {
+              "title": "Investor update",
+              "frequency": "weekly",
+              "day": "MO",
+              "monthday": 1,
+              "minutes": 35,
+              "time": "09:00",
+              "owner": "delegate"
+            }
+          ]
+        },
+        "units": {
+          "monthlyHours": "hours/month",
+          "minutes": "minutes/run"
+        },
+        "monthlyHours": 2.5277777777777777,
+        "method": "Sum minutes / 60 × monthly runs. Weekly = 52/12; biweekly = 26/12; monthly = 1.",
+        "assumptions": [
+          "Start date anchors biweekly recurrence.",
+          "Calendar uses floating local time in the importing calendar’s time zone.",
+          "Monthly dates are limited to days 1–28.",
+          "Calendar entries do not execute tasks."
+        ],
+        "provenance": {
+          "calendar": "RFC 5545 sections 3.3.5 and 3.8.5.3"
+        },
+        "schedules": [
+          {
+            "title": "Investor update",
+            "frequency": "weekly",
+            "day": "MO",
+            "monthday": 1,
+            "minutes": 35,
+            "time": "09:00",
+            "owner": "delegate",
+            "firstDate": "2026-10-05",
+            "recurrenceRule": "FREQ=WEEKLY;BYDAY=MO"
+          }
+        ],
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//OperatorNest//Recurring task planner//EN\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\nBEGIN:VEVENT\r\nUID:9ea06614a6403f295efdc301f2cdd2b479dbb27f73eaf734856effb7c5916d34-0@oper\r\n atornest.com\r\nDTSTAMP:20261005T000000Z\r\nDTSTART:20261005T090000\r\nDTEND:20261005T093500\r\nRRULE:FREQ=WEEKLY;BYDAY=MO\r\nSUMMARY:Investor update\r\nDESCRIPTION:Estimated 35 minutes per run. Plan: delegate. Review data acces\r\n s and approvals before assigning work.\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      }
+    },
+    {
+      "job": "team-meeting-slots",
+      "request": {
+        "date": "2026-10-05",
+        "people": [
+          {
+            "name": "Sam",
+            "zone": "Asia/Kolkata"
+          },
+          {
+            "name": "Priya",
+            "zone": "America/Los_Angeles"
+          }
+        ]
+      },
+      "response": {
+        "tool": "meeting-time-zone-planner",
+        "input": {
+          "date": "2026-10-05",
+          "people": [
+            {
+              "name": "Sam",
+              "zone": "Asia/Kolkata"
+            },
+            {
+              "name": "Priya",
+              "zone": "America/Los_Angeles"
+            }
+          ]
+        },
+        "units": {
+          "duration": "minutes",
+          "startUtc": "ISO 8601 UTC",
+          "score": "sum of hours from 13:00 at slot midpoint"
+        },
+        "method": "Enumerate real half-hour instants on the first person’s local date; rank shared workday slots by distance from 13:00.",
+        "assumptions": [
+          "Workday is 09:00–17:00 in each time zone.",
+          "Meeting length is 30 minutes.",
+          "No holiday or calendar availability lookup."
+        ],
+        "provenance": {
+          "timeZones": "Runtime Intl time zone database; DST applied for the selected date."
+        },
+        "rows": [
+          {
+            "start": 1791138600000,
+            "startUtc": "2026-10-04T18:30:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 12:00 a.m. GMT+5:30",
+              "Sun, Oct 4, 11:30 a.m. PDT"
+            ],
+            "score": 14
+          },
+          {
+            "start": 1791140400000,
+            "startUtc": "2026-10-04T19:00:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 12:30 a.m. GMT+5:30",
+              "Sun, Oct 4, 12:00 p.m. PDT"
+            ],
+            "score": 13
+          },
+          {
+            "start": 1791142200000,
+            "startUtc": "2026-10-04T19:30:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 1:00 a.m. GMT+5:30",
+              "Sun, Oct 4, 12:30 p.m. PDT"
+            ],
+            "score": 12
+          },
+          {
+            "start": 1791144000000,
+            "startUtc": "2026-10-04T20:00:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 1:30 a.m. GMT+5:30",
+              "Sun, Oct 4, 1:00 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791145800000,
+            "startUtc": "2026-10-04T20:30:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 2:00 a.m. GMT+5:30",
+              "Sun, Oct 4, 1:30 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791147600000,
+            "startUtc": "2026-10-04T21:00:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 2:30 a.m. GMT+5:30",
+              "Sun, Oct 4, 2:00 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791149400000,
+            "startUtc": "2026-10-04T21:30:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 3:00 a.m. GMT+5:30",
+              "Sun, Oct 4, 2:30 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791151200000,
+            "startUtc": "2026-10-04T22:00:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 3:30 a.m. GMT+5:30",
+              "Sun, Oct 4, 3:00 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791153000000,
+            "startUtc": "2026-10-04T22:30:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 4:00 a.m. GMT+5:30",
+              "Sun, Oct 4, 3:30 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791154800000,
+            "startUtc": "2026-10-04T23:00:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 4:30 a.m. GMT+5:30",
+              "Sun, Oct 4, 4:00 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791156600000,
+            "startUtc": "2026-10-04T23:30:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 5:00 a.m. GMT+5:30",
+              "Sun, Oct 4, 4:30 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791158400000,
+            "startUtc": "2026-10-05T00:00:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 5:30 a.m. GMT+5:30",
+              "Sun, Oct 4, 5:00 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791160200000,
+            "startUtc": "2026-10-05T00:30:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 6:00 a.m. GMT+5:30",
+              "Sun, Oct 4, 5:30 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791162000000,
+            "startUtc": "2026-10-05T01:00:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 6:30 a.m. GMT+5:30",
+              "Sun, Oct 4, 6:00 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791163800000,
+            "startUtc": "2026-10-05T01:30:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 7:00 a.m. GMT+5:30",
+              "Sun, Oct 4, 6:30 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791165600000,
+            "startUtc": "2026-10-05T02:00:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 7:30 a.m. GMT+5:30",
+              "Sun, Oct 4, 7:00 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791167400000,
+            "startUtc": "2026-10-05T02:30:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 8:00 a.m. GMT+5:30",
+              "Sun, Oct 4, 7:30 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791169200000,
+            "startUtc": "2026-10-05T03:00:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 8:30 a.m. GMT+5:30",
+              "Sun, Oct 4, 8:00 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791171000000,
+            "startUtc": "2026-10-05T03:30:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 9:00 a.m. GMT+5:30",
+              "Sun, Oct 4, 8:30 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791172800000,
+            "startUtc": "2026-10-05T04:00:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 9:30 a.m. GMT+5:30",
+              "Sun, Oct 4, 9:00 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791174600000,
+            "startUtc": "2026-10-05T04:30:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 10:00 a.m. GMT+5:30",
+              "Sun, Oct 4, 9:30 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791176400000,
+            "startUtc": "2026-10-05T05:00:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 10:30 a.m. GMT+5:30",
+              "Sun, Oct 4, 10:00 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791178200000,
+            "startUtc": "2026-10-05T05:30:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 11:00 a.m. GMT+5:30",
+              "Sun, Oct 4, 10:30 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791180000000,
+            "startUtc": "2026-10-05T06:00:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 11:30 a.m. GMT+5:30",
+              "Sun, Oct 4, 11:00 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791181800000,
+            "startUtc": "2026-10-05T06:30:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 12:00 p.m. GMT+5:30",
+              "Sun, Oct 4, 11:30 p.m. PDT"
+            ],
+            "score": 11.5
+          },
+          {
+            "start": 1791183600000,
+            "startUtc": "2026-10-05T07:00:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 12:30 p.m. GMT+5:30",
+              "Mon, Oct 5, 12:00 a.m. PDT"
+            ],
+            "score": 13
+          },
+          {
+            "start": 1791185400000,
+            "startUtc": "2026-10-05T07:30:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 1:00 p.m. GMT+5:30",
+              "Mon, Oct 5, 12:30 a.m. PDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791187200000,
+            "startUtc": "2026-10-05T08:00:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 1:30 p.m. GMT+5:30",
+              "Mon, Oct 5, 1:00 a.m. PDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791189000000,
+            "startUtc": "2026-10-05T08:30:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 2:00 p.m. GMT+5:30",
+              "Mon, Oct 5, 1:30 a.m. PDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791190800000,
+            "startUtc": "2026-10-05T09:00:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 2:30 p.m. GMT+5:30",
+              "Mon, Oct 5, 2:00 a.m. PDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791192600000,
+            "startUtc": "2026-10-05T09:30:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 3:00 p.m. GMT+5:30",
+              "Mon, Oct 5, 2:30 a.m. PDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791194400000,
+            "startUtc": "2026-10-05T10:00:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 3:30 p.m. GMT+5:30",
+              "Mon, Oct 5, 3:00 a.m. PDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791196200000,
+            "startUtc": "2026-10-05T10:30:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 4:00 p.m. GMT+5:30",
+              "Mon, Oct 5, 3:30 a.m. PDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791198000000,
+            "startUtc": "2026-10-05T11:00:00.000Z",
+            "inside": [
+              true,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 4:30 p.m. GMT+5:30",
+              "Mon, Oct 5, 4:00 a.m. PDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791199800000,
+            "startUtc": "2026-10-05T11:30:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 5:00 p.m. GMT+5:30",
+              "Mon, Oct 5, 4:30 a.m. PDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791201600000,
+            "startUtc": "2026-10-05T12:00:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 5:30 p.m. GMT+5:30",
+              "Mon, Oct 5, 5:00 a.m. PDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791203400000,
+            "startUtc": "2026-10-05T12:30:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 6:00 p.m. GMT+5:30",
+              "Mon, Oct 5, 5:30 a.m. PDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791205200000,
+            "startUtc": "2026-10-05T13:00:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 6:30 p.m. GMT+5:30",
+              "Mon, Oct 5, 6:00 a.m. PDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791207000000,
+            "startUtc": "2026-10-05T13:30:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 7:00 p.m. GMT+5:30",
+              "Mon, Oct 5, 6:30 a.m. PDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791208800000,
+            "startUtc": "2026-10-05T14:00:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 7:30 p.m. GMT+5:30",
+              "Mon, Oct 5, 7:00 a.m. PDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791210600000,
+            "startUtc": "2026-10-05T14:30:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 8:00 p.m. GMT+5:30",
+              "Mon, Oct 5, 7:30 a.m. PDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791212400000,
+            "startUtc": "2026-10-05T15:00:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 8:30 p.m. GMT+5:30",
+              "Mon, Oct 5, 8:00 a.m. PDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791214200000,
+            "startUtc": "2026-10-05T15:30:00.000Z",
+            "inside": [
+              false,
+              false
+            ],
+            "labels": [
+              "Mon, Oct 5, 9:00 p.m. GMT+5:30",
+              "Mon, Oct 5, 8:30 a.m. PDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791216000000,
+            "startUtc": "2026-10-05T16:00:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 9:30 p.m. GMT+5:30",
+              "Mon, Oct 5, 9:00 a.m. PDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791217800000,
+            "startUtc": "2026-10-05T16:30:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 10:00 p.m. GMT+5:30",
+              "Mon, Oct 5, 9:30 a.m. PDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791219600000,
+            "startUtc": "2026-10-05T17:00:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 10:30 p.m. GMT+5:30",
+              "Mon, Oct 5, 10:00 a.m. PDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791221400000,
+            "startUtc": "2026-10-05T17:30:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 11:00 p.m. GMT+5:30",
+              "Mon, Oct 5, 10:30 a.m. PDT"
+            ],
+            "score": 12.5
+          },
+          {
+            "start": 1791223200000,
+            "startUtc": "2026-10-05T18:00:00.000Z",
+            "inside": [
+              false,
+              true
+            ],
+            "labels": [
+              "Mon, Oct 5, 11:30 p.m. GMT+5:30",
+              "Mon, Oct 5, 11:00 a.m. PDT"
+            ],
+            "score": 12.5
+          }
+        ],
+        "overlapCount": 0,
+        "bestSlots": []
+      }
+    },
+    {
+      "job": "recurring-schedule",
+      "request": {
+        "startDate": "2026-03-08",
+        "tasks": [
+          {
+            "title": "Investor update",
+            "frequency": "weekly",
+            "day": "SU",
+            "monthday": 1,
+            "time": "02:30",
+            "minutes": 35,
+            "owner": "delegate"
+          }
+        ]
+      },
+      "response": {
+        "tool": "recurring-task-planner",
+        "input": {
+          "startDate": "2026-03-08",
+          "tasks": [
+            {
+              "title": "Investor update",
+              "frequency": "weekly",
+              "day": "SU",
+              "monthday": 1,
+              "minutes": 35,
+              "time": "02:30",
+              "owner": "delegate"
+            }
+          ]
+        },
+        "units": {
+          "monthlyHours": "hours/month",
+          "minutes": "minutes/run"
+        },
+        "monthlyHours": 2.5277777777777777,
+        "method": "Sum minutes / 60 × monthly runs. Weekly = 52/12; biweekly = 26/12; monthly = 1.",
+        "assumptions": [
+          "Start date anchors biweekly recurrence.",
+          "Calendar uses floating local time in the importing calendar’s time zone.",
+          "Monthly dates are limited to days 1–28.",
+          "Calendar entries do not execute tasks."
+        ],
+        "provenance": {
+          "calendar": "RFC 5545 sections 3.3.5 and 3.8.5.3"
+        },
+        "schedules": [
+          {
+            "title": "Investor update",
+            "frequency": "weekly",
+            "day": "SU",
+            "monthday": 1,
+            "minutes": 35,
+            "time": "02:30",
+            "owner": "delegate",
+            "firstDate": "2026-03-08",
+            "recurrenceRule": "FREQ=WEEKLY;BYDAY=SU"
+          }
+        ],
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//OperatorNest//Recurring task planner//EN\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\nBEGIN:VEVENT\r\nUID:4ac9ed83960fe1134416226adb5ae3ae08741a2a3863be1d7c1e44cbccce3839-0@oper\r\n atornest.com\r\nDTSTAMP:20260308T000000Z\r\nDTSTART:20260308T023000\r\nDTEND:20260308T030500\r\nRRULE:FREQ=WEEKLY;BYDAY=SU\r\nSUMMARY:Investor update\r\nDESCRIPTION:Estimated 35 minutes per run. Plan: delegate. Review data acces\r\n s and approvals before assigning work.\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      }
+    },
+    {
+      "job": "recurring-schedule",
+      "request": {
+        "startDate": "2026-11-01",
+        "tasks": [
+          {
+            "title": "Investor update",
+            "frequency": "weekly",
+            "day": "SU",
+            "monthday": 1,
+            "time": "01:30",
+            "minutes": 35,
+            "owner": "delegate"
+          }
+        ]
+      },
+      "response": {
+        "tool": "recurring-task-planner",
+        "input": {
+          "startDate": "2026-11-01",
+          "tasks": [
+            {
+              "title": "Investor update",
+              "frequency": "weekly",
+              "day": "SU",
+              "monthday": 1,
+              "minutes": 35,
+              "time": "01:30",
+              "owner": "delegate"
+            }
+          ]
+        },
+        "units": {
+          "monthlyHours": "hours/month",
+          "minutes": "minutes/run"
+        },
+        "monthlyHours": 2.5277777777777777,
+        "method": "Sum minutes / 60 × monthly runs. Weekly = 52/12; biweekly = 26/12; monthly = 1.",
+        "assumptions": [
+          "Start date anchors biweekly recurrence.",
+          "Calendar uses floating local time in the importing calendar’s time zone.",
+          "Monthly dates are limited to days 1–28.",
+          "Calendar entries do not execute tasks."
+        ],
+        "provenance": {
+          "calendar": "RFC 5545 sections 3.3.5 and 3.8.5.3"
+        },
+        "schedules": [
+          {
+            "title": "Investor update",
+            "frequency": "weekly",
+            "day": "SU",
+            "monthday": 1,
+            "minutes": 35,
+            "time": "01:30",
+            "owner": "delegate",
+            "firstDate": "2026-11-01",
+            "recurrenceRule": "FREQ=WEEKLY;BYDAY=SU"
+          }
+        ],
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//OperatorNest//Recurring task planner//EN\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\nBEGIN:VEVENT\r\nUID:93436cad56b1a3ea325f259acd9b9af0cc77ee68ee6e2bbc99f170e045a9ccd2-0@oper\r\n atornest.com\r\nDTSTAMP:20261101T000000Z\r\nDTSTART:20261101T013000\r\nDTEND:20261101T020500\r\nRRULE:FREQ=WEEKLY;BYDAY=SU\r\nSUMMARY:Investor update\r\nDESCRIPTION:Estimated 35 minutes per run. Plan: delegate. Review data acces\r\n s and approvals before assigning work.\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      }
+    },
+    {
+      "job": "recurring-schedule",
+      "request": {
+        "startDate": "2026-12-20",
+        "tasks": [
+          {
+            "title": "Investor update",
+            "frequency": "monthly",
+            "day": "MO",
+            "monthday": 15,
+            "time": "09:15",
+            "minutes": 35,
+            "owner": "delegate"
+          }
+        ]
+      },
+      "response": {
+        "tool": "recurring-task-planner",
+        "input": {
+          "startDate": "2026-12-20",
+          "tasks": [
+            {
+              "title": "Investor update",
+              "frequency": "monthly",
+              "day": "MO",
+              "monthday": 15,
+              "minutes": 35,
+              "time": "09:15",
+              "owner": "delegate"
+            }
+          ]
+        },
+        "units": {
+          "monthlyHours": "hours/month",
+          "minutes": "minutes/run"
+        },
+        "monthlyHours": 0.5833333333333334,
+        "method": "Sum minutes / 60 × monthly runs. Weekly = 52/12; biweekly = 26/12; monthly = 1.",
+        "assumptions": [
+          "Start date anchors biweekly recurrence.",
+          "Calendar uses floating local time in the importing calendar’s time zone.",
+          "Monthly dates are limited to days 1–28.",
+          "Calendar entries do not execute tasks."
+        ],
+        "provenance": {
+          "calendar": "RFC 5545 sections 3.3.5 and 3.8.5.3"
+        },
+        "schedules": [
+          {
+            "title": "Investor update",
+            "frequency": "monthly",
+            "day": "MO",
+            "monthday": 15,
+            "minutes": 35,
+            "time": "09:15",
+            "owner": "delegate",
+            "firstDate": "2027-01-15",
+            "recurrenceRule": "FREQ=MONTHLY;BYMONTHDAY=15"
+          }
+        ],
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//OperatorNest//Recurring task planner//EN\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\nBEGIN:VEVENT\r\nUID:5d0afdd34e66b6525800b54e8e20a9711444e7c7e26b95a33031fff941148153-0@oper\r\n atornest.com\r\nDTSTAMP:20261220T000000Z\r\nDTSTART:20270115T091500\r\nDTEND:20270115T095000\r\nRRULE:FREQ=MONTHLY;BYMONTHDAY=15\r\nSUMMARY:Investor update\r\nDESCRIPTION:Estimated 35 minutes per run. Plan: delegate. Review data acces\r\n s and approvals before assigning work.\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      }
+    },
+    {
+      "job": "recurring-schedule",
+      "request": {
+        "startDate": "2026-10-05",
+        "tasks": [
+          {
+            "title": "Investor update",
+            "frequency": "biweekly",
+            "day": "MO",
+            "monthday": 1,
+            "time": "09:00",
+            "minutes": 35,
+            "owner": "delegate"
+          }
+        ]
+      },
+      "response": {
+        "tool": "recurring-task-planner",
+        "input": {
+          "startDate": "2026-10-05",
+          "tasks": [
+            {
+              "title": "Investor update",
+              "frequency": "biweekly",
+              "day": "MO",
+              "monthday": 1,
+              "minutes": 35,
+              "time": "09:00",
+              "owner": "delegate"
+            }
+          ]
+        },
+        "units": {
+          "monthlyHours": "hours/month",
+          "minutes": "minutes/run"
+        },
+        "monthlyHours": 1.2638888888888888,
+        "method": "Sum minutes / 60 × monthly runs. Weekly = 52/12; biweekly = 26/12; monthly = 1.",
+        "assumptions": [
+          "Start date anchors biweekly recurrence.",
+          "Calendar uses floating local time in the importing calendar’s time zone.",
+          "Monthly dates are limited to days 1–28.",
+          "Calendar entries do not execute tasks."
+        ],
+        "provenance": {
+          "calendar": "RFC 5545 sections 3.3.5 and 3.8.5.3"
+        },
+        "schedules": [
+          {
+            "title": "Investor update",
+            "frequency": "biweekly",
+            "day": "MO",
+            "monthday": 1,
+            "minutes": 35,
+            "time": "09:00",
+            "owner": "delegate",
+            "firstDate": "2026-10-05",
+            "recurrenceRule": "FREQ=WEEKLY;INTERVAL=2;BYDAY=MO"
+          }
+        ],
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//OperatorNest//Recurring task planner//EN\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\nBEGIN:VEVENT\r\nUID:c038452df31963b96657236bc4b20e64ef6aebcc74f8dc6bbcc307ebcbbab385-0@oper\r\n atornest.com\r\nDTSTAMP:20261005T000000Z\r\nDTSTART:20261005T090000\r\nDTEND:20261005T093500\r\nRRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=MO\r\nSUMMARY:Investor update\r\nDESCRIPTION:Estimated 35 minutes per run. Plan: delegate. Review data acces\r\n s and approvals before assigning work.\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      }
+    }
+  ]
+}

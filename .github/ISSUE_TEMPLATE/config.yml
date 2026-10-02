@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Private security report
+    url: mailto:operatornest+security@gmail.com
+    about: Report vulnerabilities privately.
+  - name: Conduct report
+    url: mailto:operatornest+conduct@gmail.com
+    about: Report community conduct concerns privately.

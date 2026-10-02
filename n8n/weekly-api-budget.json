@@ -1,0 +1,277 @@
+{
+  "name": "Check weekly AI API budgets with HTTP Request and OperatorNest",
+  "nodes": [
+    {
+      "id": "monday-budget-check",
+      "name": "Monday budget check",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "weeksInterval": 1,
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 9,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "budget-inputs",
+      "name": "Budget inputs",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"request\": {\n    \"inputTokens\": 10000,\n    \"cachedInputTokens\": 5000,\n    \"outputTokens\": 2000,\n    \"requestsPerDay\": 100,\n    \"requestsPerMonth\": 3000,\n    \"modelIds\": [\n      \"anthropic/claude-opus-5-5\",\n      \"openai/gpt-5.4\"\n    ]\n  },\n  \"thresholdUsdPerWeek\": 25\n}",
+        "options": {}
+      }
+    },
+    {
+      "id": "prepare-request",
+      "name": "Prepare request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "function parseSchedule(raw) {\n  if (typeof raw !== 'string' || raw.length > 100) throw new Error('Enter a supported schedule of at most 100 characters.');\n  const days = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];\n  const plain = /^(weekly|biweekly) (MO|TU|WE|TH|FR|SA|SU) ((?:[01]\\d|2[0-3]):[0-5]\\d)$/.exec(raw);\n  if (plain) return { frequency: plain[1], day: plain[2], monthday: 1, time: plain[3] };\n  const monthly = /^monthly ([1-9]|1\\d|2[0-8]) ((?:[01]\\d|2[0-3]):[0-5]\\d)$/.exec(raw);\n  if (monthly) return { frequency: 'monthly', day: 'MO', monthday: Number(monthly[1]), time: monthly[2] };\n  const cron = /^(\\d{1,2}) (\\d{1,2}) (\\*|\\d{1,2}) \\* (\\*|[0-7])$/.exec(raw);\n  if (cron && Number(cron[1]) <= 59 && Number(cron[2]) <= 23) {\n    const time = `${cron[2].padStart(2, '0')}:${cron[1].padStart(2, '0')}`;\n    if (cron[3] === '*' && cron[4] !== '*') return { frequency: 'weekly', day: days[Number(cron[4]) % 7], monthday: 1, time };\n    if (cron[4] === '*' && Number(cron[3]) >= 1 && Number(cron[3]) <= 28) return { frequency: 'monthly', day: 'MO', monthday: Number(cron[3]), time };\n  }\n  throw new Error('Use weekly MO 09:00, biweekly MO 09:00, monthly 15 09:00, or fixed weekly/monthly five-field cron. Daily, ranges, lists, steps and month days above 28 are unsupported.');\n}\nfunction prepare(id, input) {\n  if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('Send a JSON object.');\n  let request;\n  if (id === 'weekly-api-budget') {\n    if (typeof input.thresholdUsdPerWeek !== 'number' || !Number.isFinite(input.thresholdUsdPerWeek) || input.thresholdUsdPerWeek < 0) throw new Error('Set a nonnegative weekly threshold in USD.');\n    request = input.request;\n  } else if (id === 'team-meeting-slots') {\n    request = { date: input.date, people: input.people };\n  } else {\n    if (typeof input.zone !== 'string' || !input.zone.length) throw new Error('Set an IANA time zone.');\n    new Intl.DateTimeFormat('en-US', { timeZone: input.zone }).format(0);\n    request = { startDate: input.startDate, tasks: [{ title: input.title, ...parseSchedule(input.schedule), minutes: input.minutes, owner: input.owner }] };\n  }\n  return { config: input, request, requestJson: JSON.stringify(request) };\n}\nreturn [{ json: prepare(\"weekly-api-budget\", $input.first().json) }];"
+      }
+    },
+    {
+      "id": "calculate-with-operatornest",
+      "name": "Calculate with OperatorNest",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        750,
+        300
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://operatornest.com/api/tools/ai-api-cost-calculator",
+        "authentication": "none",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.request) }}",
+        "options": {
+          "timeout": 20000,
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "build-result",
+      "name": "Build result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "function utcCandidates(local, zone) {\n  const target = Date.parse(`${local}Z`);\n  const formatter = new Intl.DateTimeFormat('en-GB', { timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });\n  const wall = (instant) => {\n    const p = Object.fromEntries(formatter.formatToParts(instant).map(p => [p.type, p.value]));\n    return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}:${p.second}`;\n  };\n  const offsets = new Set();\n  for (let hour = -36; hour <= 36; hour += 3) {\n    const instant = target + hour * 3600000;\n    offsets.add(Date.parse(`${wall(instant)}Z`) - instant);\n  }\n  return [...offsets].map(offset => target - offset).filter(instant => wall(instant) === local)\n    .sort((a, b) => a - b).map(instant => new Date(instant).toISOString());\n}\nfunction finish(id, result, config, platform) {\n  let output;\n  if (id === 'weekly-api-budget') {\n    const estimates = result.estimates.map(e => ({ modelId: e.modelId, usdPerWeek: e.perDay === null ? null : e.perDay * 7 }));\n    const over = estimates.filter(e => e.usdPerWeek === null || e.usdPerWeek > config.thresholdUsdPerWeek);\n    output = { alert: over.length > 0, estimates, thresholdUsdPerWeek: config.thresholdUsdPerWeek,\n      message: over.length ? `Weekly API budget needs attention. Threshold: USD ${config.thresholdUsdPerWeek}.\\n${over.map(e => `${e.modelId}: ${e.usdPerWeek === null ? 'rates unavailable' : `USD ${e.usdPerWeek.toFixed(2)} / week`}`).join('\\n')}` : 'All selected model estimates are within the weekly threshold.',\n      assumptions: result.assumptions, provenance: result.provenance };\n  } else if (id === 'team-meeting-slots') {\n    const slots = result.rows.filter(r => r.inside.every(Boolean)).sort((a, b) => a.start - b.start);\n    const windows = [];\n    for (const slot of slots) {\n      const previous = windows[windows.length - 1];\n      if (previous && previous.end === slot.start) { previous.end = slot.start + 1800000; previous.endUtc = new Date(previous.end).toISOString(); }\n      else windows.push({ start: slot.start, end: slot.start + 1800000, startUtc: slot.startUtc, endUtc: new Date(slot.start + 1800000).toISOString(), localStartLabels: slot.labels });\n    }\n    output = { status: windows.length ? 'overlap' : 'no_overlap', windows, bestSlots: result.bestSlots, overlapCount: result.overlapCount, assumptions: result.assumptions, provenance: result.provenance };\n  } else {\n    const task = result.schedules[0];\n    const nextRuns = [];\n    const warnings = ['Runs start on or after startDate, including the whole first day. Holidays and missed-run recovery are not checked.', 'The API calendar uses floating local times. Set the scheduler time zone explicitly; UTC offsets can change with DST.', 'Choose whether to skip or move nonexistent DST times, and whether repeated times run once or twice.'];\n    for (let i = 0; i < 6; i++) {\n      const date = new Date(`${task.firstDate}T00:00:00Z`);\n      if (task.frequency === 'monthly') date.setUTCMonth(date.getUTCMonth() + i);\n      else date.setUTCDate(date.getUTCDate() + i * (task.frequency === 'biweekly' ? 14 : 7));\n      const local = `${date.toISOString().slice(0, 10)}T${task.time}:00`;\n      const candidates = utcCandidates(local, config.zone);\n      const status = candidates.length === 0 ? 'nonexistent' : candidates.length === 1 ? 'unique' : 'repeated';\n      nextRuns.push({ local, zone: config.zone, status, utcCandidates: candidates });\n      if (status !== 'unique') warnings.push(`${local} in ${config.zone} is ${status}. Check the scheduler DST policy.`);\n    }\n    if (nextRuns.some(run => run.local.slice(0, 10) > '2100-12-31')) throw new Error('The next six runs exceed the supported date range. Use an earlier startDate.');\n    output = { nextRuns, warnings, recurrenceRule: task.recurrenceRule, monthlyHours: result.monthlyHours, ics: result.ics, assumptions: result.assumptions, provenance: result.provenance };\n  }\n  const tool = { 'weekly-api-budget': 'ai-api-cost-calculator', 'team-meeting-slots': 'meeting-time-zone-planner', 'recurring-schedule': 'recurring-task-planner' }[id];\n  output.attribution = { name: 'OperatorNest', url: `https://operatornest.com/tools/${tool}?utm_source=${platform}&utm_medium=template&utm_campaign=${id}` };\n  if (output.message) output.message += `\\nCalculation by OperatorNest: ${output.attribution.url}`;\n  return { ...output, ...(output.message ? { messageHtml: `<pre>${output.message.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>` } : {}), responseJson: JSON.stringify(output) };\n}\nreturn [{ json: finish(\"weekly-api-budget\", $input.first().json, $(\"Prepare request\").first().json.config, 'n8n') }];"
+      }
+    },
+    {
+      "id": "needs-attention",
+      "name": "Needs attention",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1250,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "budget-alert",
+              "leftValue": "={{ $json.alert }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "email-budget-alert",
+      "name": "Email budget alert",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1500,
+        300
+      ],
+      "parameters": {
+        "fromEmail": "operator@example.invalid",
+        "toEmail": "recipient@example.invalid",
+        "subject": "Weekly API budget needs attention",
+        "emailFormat": "text",
+        "text": "={{ $json.message }}",
+        "options": {
+          "appendAttribution": false
+        }
+      }
+    },
+    {
+      "id": "setup-and-attribution",
+      "name": "Setup and attribution",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -620,
+        -40
+      ],
+      "parameters": {
+        "content": "## Check weekly AI API budgets\n\nFor operators checking a recurring API workload before the next week starts.\n\n### How it works\nEvery Monday at 09:00 UTC, the workflow sends token volumes to the public cost API. It estimates seven days of usage for each selected model and emails when any estimate exceeds your weekly threshold or has missing rates. Models are alternatives for the same workload. Estimates exclude non-token charges. API failures stop the run; check execution errors.\n\n### Setup\nEdit the example token volumes, request volumes, model IDs and threshold in Budget inputs. Set your email connection, sender and recipient before publishing. Test a low threshold that sends an alert, then a high threshold that sends none. Change the trigger and workflow time zone to match your reporting day.\n\nCalculation by [OperatorNest](https://operatornest.com/tools/ai-api-cost-calculator?utm_source=n8n&utm_medium=template&utm_campaign=weekly-api-budget). No OperatorNest account required.",
+        "color": 1,
+        "height": 650,
+        "width": 540
+      }
+    },
+    {
+      "id": "prepare-and-calculate",
+      "name": "Prepare and calculate",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        180
+      ],
+      "parameters": {
+        "content": "## Prepare and calculate\nReceive the inputs and call the public tool API.",
+        "color": 7,
+        "height": 280,
+        "width": 1000
+      }
+    },
+    {
+      "id": "return-or-alert",
+      "name": "Return or alert",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        960,
+        180
+      ],
+      "parameters": {
+        "content": "## Check the threshold\nEmail only when an estimate needs attention.",
+        "color": 7,
+        "height": 280,
+        "width": 750
+      }
+    }
+  ],
+  "connections": {
+    "Monday budget check": {
+      "main": [
+        [
+          {
+            "node": "Budget inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Budget inputs": {
+      "main": [
+        [
+          {
+            "node": "Prepare request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare request": {
+      "main": [
+        [
+          {
+            "node": "Calculate with OperatorNest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate with OperatorNest": {
+      "main": [
+        [
+          {
+            "node": "Build result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build result": {
+      "main": [
+        [
+          {
+            "node": "Needs attention",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Needs attention": {
+      "main": [
+        [
+          {
+            "node": "Email budget alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "UTC"
+  },
+  "pinData": {},
+  "tags": []
+}

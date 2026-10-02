@@ -1,0 +1,1072 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "OperatorNest public tool API",
+    "version": "1.0.0",
+    "description": "Three stateless deterministic calculations and a read-only model catalog. No authentication, model inference, storage or calendar submission. Inputs and results have bounded documented schemas."
+  },
+  "servers": [
+    {
+      "url": "https://operatornest.com"
+    }
+  ],
+  "externalDocs": {
+    "url": "https://operatornest.com/tools/api"
+  },
+  "paths": {
+    "/api/tools/ai-api-cost-calculator": {
+      "post": {
+        "operationId": "ai_api_cost_calculator",
+        "summary": "Calculate ai api cost calculator",
+        "requestBody": {
+          "required": true,
+          "description": "UTF-8 JSON, at most 32768 bytes.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ai-api-cost-calculator-input"
+              },
+              "example": {
+                "inputTokens": 10000,
+                "cachedInputTokens": 5000,
+                "outputTokens": 2000,
+                "requestsPerDay": 100,
+                "requestsPerMonth": 3000,
+                "modelIds": [
+                  "anthropic/claude-opus-5-5"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Calculation result with normalized input, units, method, assumptions and provenance.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ai-api-cost-calculator-result"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed JSON or unreadable request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_json",
+                    "message": "Send valid UTF-8 JSON."
+                  }
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request exceeds 32768 bytes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "body_too_large",
+                    "message": "JSON body must be at most 32768 bytes."
+                  }
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported request media type.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "unsupported_media_type",
+                    "message": "Send application/json."
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid bounded input, model ID, timezone or date. Field identifies the input to correct.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_input",
+                    "message": "Cached tokens cannot exceed input tokens."
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected calculation error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "calculation_failed",
+                    "message": "Calculation unavailable. Try again."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Unsupported method",
+        "responses": {
+          "405": {
+            "description": "Use POST.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "method_not_allowed",
+                    "message": "Use POST for this tool."
+                  }
+                }
+              }
+            },
+            "headers": {
+              "Allow": {
+                "schema": {
+                  "const": "POST"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tools/meeting-time-zone-planner": {
+      "post": {
+        "operationId": "meeting_time_zone_planner",
+        "summary": "Calculate meeting time zone planner",
+        "requestBody": {
+          "required": true,
+          "description": "UTF-8 JSON, at most 32768 bytes.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/meeting-time-zone-planner-input"
+              },
+              "example": {
+                "date": "2026-10-05",
+                "people": [
+                  {
+                    "name": "Sam",
+                    "zone": "America/Los_Angeles"
+                  },
+                  {
+                    "name": "Priya",
+                    "zone": "America/New_York"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Calculation result with normalized input, units, method, assumptions and provenance.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/meeting-time-zone-planner-result"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed JSON or unreadable request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_json",
+                    "message": "Send valid UTF-8 JSON."
+                  }
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request exceeds 32768 bytes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "body_too_large",
+                    "message": "JSON body must be at most 32768 bytes."
+                  }
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported request media type.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "unsupported_media_type",
+                    "message": "Send application/json."
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid bounded input, model ID, timezone or date. Field identifies the input to correct.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_input",
+                    "message": "Cached tokens cannot exceed input tokens."
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected calculation error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "calculation_failed",
+                    "message": "Calculation unavailable. Try again."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Unsupported method",
+        "responses": {
+          "405": {
+            "description": "Use POST.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "method_not_allowed",
+                    "message": "Use POST for this tool."
+                  }
+                }
+              }
+            },
+            "headers": {
+              "Allow": {
+                "schema": {
+                  "const": "POST"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tools/recurring-task-planner": {
+      "post": {
+        "operationId": "recurring_task_planner",
+        "summary": "Calculate recurring task planner",
+        "requestBody": {
+          "required": true,
+          "description": "UTF-8 JSON, at most 32768 bytes.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/recurring-task-planner-input"
+              },
+              "example": {
+                "startDate": "2026-10-05",
+                "tasks": [
+                  {
+                    "title": "Investor update",
+                    "frequency": "weekly",
+                    "day": "MO",
+                    "monthday": 1,
+                    "minutes": 35,
+                    "time": "09:00",
+                    "owner": "delegate"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Calculation result with normalized input, units, method, assumptions and provenance.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/recurring-task-planner-result"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed JSON or unreadable request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_json",
+                    "message": "Send valid UTF-8 JSON."
+                  }
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request exceeds 32768 bytes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "body_too_large",
+                    "message": "JSON body must be at most 32768 bytes."
+                  }
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported request media type.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "unsupported_media_type",
+                    "message": "Send application/json."
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid bounded input, model ID, timezone or date. Field identifies the input to correct.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_input",
+                    "message": "Cached tokens cannot exceed input tokens."
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected calculation error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "calculation_failed",
+                    "message": "Calculation unavailable. Try again."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Unsupported method",
+        "responses": {
+          "405": {
+            "description": "Use POST.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "method_not_allowed",
+                    "message": "Use POST for this tool."
+                  }
+                }
+              }
+            },
+            "headers": {
+              "Allow": {
+                "schema": {
+                  "const": "POST"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "field": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "ai-api-cost-calculator-input": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "inputTokens": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000000
+          },
+          "cachedInputTokens": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000000
+          },
+          "outputTokens": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000000
+          },
+          "requestsPerDay": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000000
+          },
+          "requestsPerMonth": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000000
+          },
+          "modelIds": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "pattern": "\\S"
+            }
+          },
+          "batchModelIds": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 20,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "pattern": "\\S"
+            },
+            "description": "Optional model IDs using a published batch discount."
+          }
+        },
+        "required": [
+          "inputTokens",
+          "cachedInputTokens",
+          "outputTokens",
+          "requestsPerDay",
+          "requestsPerMonth",
+          "modelIds"
+        ]
+      },
+      "ai-api-cost-calculator-result": {
+        "type": "object",
+        "properties": {
+          "tool": {
+            "const": "ai-api-cost-calculator"
+          },
+          "input": {
+            "$ref": "#/components/schemas/ai-api-cost-calculator-input"
+          },
+          "units": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "method": {
+            "type": "string"
+          },
+          "assumptions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "provenance": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "estimates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "modelId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "perRequest": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "perDay": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "perMonth": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "longContext": {
+                  "type": "boolean"
+                },
+                "batch": {
+                  "type": "boolean"
+                },
+                "ratesPerMillion": {
+                  "type": "object",
+                  "properties": {
+                    "input": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "cachedInput": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "output": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "input",
+                    "cachedInput",
+                    "output"
+                  ],
+                  "additionalProperties": false
+                },
+                "sourceUrl": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "note": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "modelId",
+                "name",
+                "perRequest",
+                "perDay",
+                "perMonth",
+                "longContext",
+                "batch",
+                "ratesPerMillion",
+                "sourceUrl",
+                "note"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "tool",
+          "input",
+          "units",
+          "method",
+          "assumptions",
+          "provenance",
+          "estimates"
+        ],
+        "additionalProperties": false
+      },
+      "meeting-time-zone-planner-input": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "description": "Real date from 2000-01-01 to 2100-12-31."
+          },
+          "people": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 8,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "\\S"
+                },
+                "zone": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100,
+                  "pattern": "\\S",
+                  "description": "An IANA time zone supported by Intl.DateTimeFormat, such as America/New_York."
+                }
+              },
+              "required": [
+                "name",
+                "zone"
+              ]
+            }
+          }
+        },
+        "required": [
+          "date",
+          "people"
+        ]
+      },
+      "meeting-time-zone-planner-result": {
+        "type": "object",
+        "properties": {
+          "tool": {
+            "const": "meeting-time-zone-planner"
+          },
+          "input": {
+            "$ref": "#/components/schemas/meeting-time-zone-planner-input"
+          },
+          "units": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "method": {
+            "type": "string"
+          },
+          "assumptions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "provenance": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "start": {
+                  "type": "integer",
+                  "description": "Unix epoch milliseconds."
+                },
+                "startUtc": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "inside": {
+                  "type": "array",
+                  "items": {
+                    "type": "boolean"
+                  }
+                },
+                "labels": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "score": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "start",
+                "startUtc",
+                "inside",
+                "labels",
+                "score"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "overlapCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "bestSlots": {
+            "type": "array",
+            "maxItems": 3,
+            "items": {
+              "type": "object",
+              "properties": {
+                "start": {
+                  "type": "integer",
+                  "description": "Unix epoch milliseconds."
+                },
+                "startUtc": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "inside": {
+                  "type": "array",
+                  "items": {
+                    "type": "boolean"
+                  }
+                },
+                "labels": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "score": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "start",
+                "startUtc",
+                "inside",
+                "labels",
+                "score"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "tool",
+          "input",
+          "units",
+          "method",
+          "assumptions",
+          "provenance",
+          "rows",
+          "overlapCount",
+          "bestSlots"
+        ],
+        "additionalProperties": false
+      },
+      "recurring-task-planner-input": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "description": "Real date from 2000-01-01 to 2100-12-31."
+          },
+          "tasks": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 20,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "\\S"
+                },
+                "frequency": {
+                  "type": "string",
+                  "enum": [
+                    "weekly",
+                    "biweekly",
+                    "monthly"
+                  ]
+                },
+                "day": {
+                  "type": "string",
+                  "enum": [
+                    "MO",
+                    "TU",
+                    "WE",
+                    "TH",
+                    "FR",
+                    "SA",
+                    "SU"
+                  ]
+                },
+                "monthday": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 28
+                },
+                "minutes": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1440
+                },
+                "time": {
+                  "type": "string",
+                  "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                },
+                "owner": {
+                  "type": "string",
+                  "enum": [
+                    "delegate",
+                    "keep",
+                    "decide"
+                  ]
+                }
+              },
+              "required": [
+                "title",
+                "frequency",
+                "day",
+                "monthday",
+                "minutes",
+                "time",
+                "owner"
+              ]
+            }
+          }
+        },
+        "required": [
+          "startDate",
+          "tasks"
+        ]
+      },
+      "recurring-task-planner-result": {
+        "type": "object",
+        "properties": {
+          "tool": {
+            "const": "recurring-task-planner"
+          },
+          "input": {
+            "$ref": "#/components/schemas/recurring-task-planner-input"
+          },
+          "units": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "method": {
+            "type": "string"
+          },
+          "assumptions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "provenance": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "monthlyHours": {
+            "type": "number"
+          },
+          "schedules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "\\S"
+                },
+                "frequency": {
+                  "type": "string",
+                  "enum": [
+                    "weekly",
+                    "biweekly",
+                    "monthly"
+                  ]
+                },
+                "day": {
+                  "type": "string",
+                  "enum": [
+                    "MO",
+                    "TU",
+                    "WE",
+                    "TH",
+                    "FR",
+                    "SA",
+                    "SU"
+                  ]
+                },
+                "monthday": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 28
+                },
+                "minutes": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1440
+                },
+                "time": {
+                  "type": "string",
+                  "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                },
+                "owner": {
+                  "type": "string",
+                  "enum": [
+                    "delegate",
+                    "keep",
+                    "decide"
+                  ]
+                },
+                "firstDate": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "recurrenceRule": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "title",
+                "frequency",
+                "day",
+                "monthday",
+                "minutes",
+                "time",
+                "owner",
+                "firstDate",
+                "recurrenceRule"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "ics": {
+            "type": "string",
+            "description": "RFC 5545 calendar with CRLF folding and floating local times."
+          }
+        },
+        "required": [
+          "tool",
+          "input",
+          "units",
+          "method",
+          "assumptions",
+          "provenance",
+          "monthlyHours",
+          "schedules",
+          "ics"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+}
