@@ -1,0 +1,6 @@
+{
+  "commands": {
+    "setup": "just setup",
+    "check": "just check"
+  }
+}
