@@ -16,7 +16,7 @@ Follow explicit human instructions, then the nearest AGENTS.md, then this file. 
 
 ## Validate
 
-Use Node.js 22 or later. From the repository root, run exactly:
+Run `just setup` to install Node 26 and pnpm 12 for checkout development. The published artifacts support Node.js 22 or later. From the repository root, run exactly:
 
 ```sh
 node scripts/check.mjs

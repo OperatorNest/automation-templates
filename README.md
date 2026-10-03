@@ -6,6 +6,16 @@ Three recurring checks, each packaged as an n8n workflow and a Make scenario blu
 
 These templates use the public tool API documented at [operatornest.com](https://operatornest.com/tools/api).
 
+The `justfile` installs the checkout toolchain, checks prerequisites and validates the template files:
+
+```sh
+just setup
+just doctor
+just check
+```
+
+There are no third-party package dependencies to install.
+
 ## Templates
 
 Each job has a matching JSON file under `n8n/` and a `.blueprint.json` file under `make/`.
@@ -101,7 +111,7 @@ Each next run includes `local`, `zone`, `status` and `utcCandidates`. A DST gap 
 
 ## Validate
 
-With Node.js 22 or later, run from the checkout root:
+For checkout validation, run `just setup` to install Node 26 and pnpm 12, then run from the checkout root (published artifacts support Node.js 22 or later):
 
 ```sh
 node scripts/check.mjs
